@@ -7,6 +7,7 @@
 #include <dmaKit.h>
 
 #include "totrus_input.h"
+#include "totrus_screen.h"
 
 
 
@@ -74,8 +75,9 @@ int main(int argc, char *argv[])
         if(y > gs->Height - tam) y = gs->Height - tam;
 
         gsKit_clear(gs, negro);
+        renderScreen(gs);
 
-        u64 color = (mando & PAD_CROSS) ? amarillo : celeste;
+        u64 color = amarillo;
 
         gsKit_prim_sprite(
             gs,
@@ -84,6 +86,8 @@ int main(int argc, char *argv[])
             1,
             color
         );
+
+        
 
         gsKit_queue_exec(gs);
         gsKit_sync_flip(gs);
