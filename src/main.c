@@ -14,11 +14,11 @@
 int main(int argc, char *argv[])
 {
     GSGLOBAL *gs;
-    u64 negro, celeste, amarillo;
+    u64 negro, celeste, amarillo, rojo;
     float x, y;
     const float tam = 48.0f;
     const float velocidad = 4.0f;
-    iniciarMando();
+    int mandoOK = iniciarMando();
 
     gs = gsKit_init_global();
 
@@ -47,6 +47,8 @@ int main(int argc, char *argv[])
     negro    = GS_SETREG_RGBAQ(0x00, 0x00, 0x00, 0x80, 0x00);
     celeste  = GS_SETREG_RGBAQ(0x00, 0xC0, 0xFF, 0x80, 0x00);
     amarillo = GS_SETREG_RGBAQ(0xFF, 0xD0, 0x00, 0x80, 0x00);
+    rojo     = GS_SETREG_RGBAQ(0xFF, 0x00, 0x00, 0x80, 0x00);
+
 
     x = (gs->Width - tam) * 0.5f;
     y = (gs->Height - tam) * 0.5f;
@@ -54,6 +56,7 @@ int main(int argc, char *argv[])
     while(1)
     {
         u32 mando = leerMando();
+    
 
         if(mando & PAD_LEFT)  x -= velocidad;
         if(mando & PAD_RIGHT) x += velocidad;
@@ -72,12 +75,14 @@ int main(int argc, char *argv[])
 
         gsKit_clear(gs, negro);
 
+        u64 color = (mando & PAD_CROSS) ? amarillo : celeste;
+
         gsKit_prim_sprite(
             gs,
             x, y,
             x + tam, y + tam,
             1,
-            (mando & PAD_CROSS) ? amarillo : celeste
+            color
         );
 
         gsKit_queue_exec(gs);
