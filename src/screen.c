@@ -1,21 +1,33 @@
-#include "totrus_screen.h"
+#include "block_battle_screen.h"
 #include <debug.h>
 
 //0 = both empty, 240 = top full bottom empty; 15 = bottom full top empty; 255 both full
 
 
-//         column row
-u8 screen [10][10] = {
-    {255,0,0,0,0,0,0,0,0,0},
-    {0,0,0,0,0,0,0,0,0,0},
-    {0,0,0,0,0,0,0,0,0,0},
-    {0,0,0,0,0,0,0,0,0,0},
-    {0,0,0,0,0,0,0,0,0,0},
-    {0,0,0,0,0,0,0,0,0,0},
-    {0,0,0,0,0,0,0,0,245,0},
-    {0,0,0,0,0,0,0,0,0,0},
-    {0,0,0,0,0,0,0,0,0,0},
-    {15,2,0,244,0,0,0,0,0,241},
+//         row column
+u8 screen [22][5] = {
+    {255,0,0,0,3},
+    {0,0,0,0,0},
+    {0,0,0,0,0},
+    {0,0,0,0,0},
+    {0,0,0,0,0},
+    {0,0,0,0,0},
+    {0,0,0,0,0},
+    {0,0,0,0,0},
+    {0,0,0,0,0},
+    {0,0,0,0,0},
+    {0,0,0,0,0},
+    {0,0,0,0,0},
+    {0,0,0,0,0},
+    {0,0,0,0,0},
+    {0,0,0,0,0},
+    {0,0,0,0,0},
+    {0,0,0,0,0},
+    {0,0,0,0,0},
+    {0,0,0,0,0},
+    {0,0,0,0,0},
+    {0,0,0,0,0},
+    {255,0,0,0,0},
 };
 
 static u64 red   = GS_SETREG_RGBAQ(0xFF, 0x06, 0x06, 0x80, 0x00);
@@ -32,12 +44,12 @@ static u64 black  = GS_SETREG_RGBAQ(0x00, 0xC0, 0xFF, 0x80, 0x00);
 
 u8 getBlock(u8 row, u8 column){
     if(row >= SCREEN_HEIGHT || column >= SCREEN_WIDTH) return 0;
-    return screen[column][row];
+    return screen[row][column];
 }
 
 void setBlock(u8 value, u8 row, u8 column){
     if(row >= SCREEN_HEIGHT || column >= SCREEN_WIDTH) return;
-    screen[column][row] = value;
+    screen[row][column] = value;
 }
 
 void clearBlocks(void){
@@ -52,8 +64,8 @@ void renderScreen(GSGLOBAL *gs){
     const float blockSize = 15.0f;
     const float gap = 2.0f;
 
-    const float width = SCREEN_WIDTH * blockSize;
-    const float height = SCREEN_HEIGHT * 2 * blockSize;
+    const float width = SCREEN_WIDTH * 2 * blockSize;
+    const float height = SCREEN_HEIGHT * blockSize;
 
     const float startX = (gs->Width - width) * 0.5f;
     const float startY = (gs->Height - height) * 0.5f;
@@ -77,8 +89,8 @@ void renderScreen(GSGLOBAL *gs){
                 case 5: color = yellow; break;
                 default: color = orange; break;
                 };
-                x = startX + column * blockSize;
-                y = startY + row * 2 * blockSize;
+                x = startX + column * 2 * blockSize;
+                y = startY + row * blockSize;
                 gsKit_prim_sprite(gs, x + gap, y + gap, x + blockSize - gap, y + blockSize - gap, 1, color);
                
             }  
@@ -92,8 +104,8 @@ void renderScreen(GSGLOBAL *gs){
                 case 5: color = yellow; break;
                 default: color = orange; break;
                 };
-                x = startX + column * blockSize;
-                y = startY + ((row * 2) + 1) * blockSize;
+                x = startX + ((column * 2) + 1) * blockSize;
+                y = startY +  row * blockSize;
                 gsKit_prim_sprite(gs, x + gap, y + gap, x + blockSize - gap, y + blockSize - gap, 1, color);
                 
             }

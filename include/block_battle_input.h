@@ -1,5 +1,5 @@
-#ifndef TOTRUS_INPUT_H
-#define TOTRUS_INPUT_H
+#ifndef BLOCK_BATTLE_INPUT_H
+#define BLOCK_BATTLE_INPUT_H
 
 #include <tamtypes.h>
 #include <libpad.h>

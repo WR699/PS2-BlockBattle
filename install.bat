@@ -2,7 +2,7 @@
 setlocal EnableExtensions EnableDelayedExpansion
 chcp 65001 >nul
 
-title Totrus - Instalador de entorno PS2
+title Block Battle - Instalador de entorno PS2
 
 rem ============================================================
 rem Todo se calcula desde la carpeta donde vive este BAT.
@@ -25,7 +25,7 @@ if not exist "!DOWNLOADS!" mkdir "!DOWNLOADS!"
 
 echo.
 echo ========================================
-echo       TOTRUS - INSTALAR ENTORNO PS2
+echo       BLOCK BATTLE - INSTALAR ENTORNO PS2
 echo ========================================
 echo.
 echo Proyecto: !SAFE_ROOT!
@@ -97,7 +97,7 @@ if exist "!PS2DEV!\ee\bin\mips64r5900el-ps2-elf-gcc.exe" (
         powershell.exe -NoProfile -ExecutionPolicy Bypass -Command ^
           "$ErrorActionPreference='Stop';" ^
           "$ProgressPreference='SilentlyContinue';" ^
-          "Invoke-WebRequest -UseBasicParsing -Headers @{'User-Agent'='Totrus-Installer'} -Uri 'https://github.com/ps2dev/ps2dev/releases/download/latest/ps2dev-windows-latest.tar.gz' -OutFile '!PS2DEV_ARCHIVE!'"
+          "Invoke-WebRequest -UseBasicParsing -Headers @{'User-Agent'='BlockBattle-Installer'} -Uri 'https://github.com/ps2dev/ps2dev/releases/download/latest/ps2dev-windows-latest.tar.gz' -OutFile '!PS2DEV_ARCHIVE!'"
 
         if errorlevel 1 (
             echo ERROR: no se pudo descargar PS2DEV.
@@ -122,7 +122,7 @@ if exist "!PS2DEV!\ee\bin\mips64r5900el-ps2-elf-gcc.exe" (
     "!MSYS!\usr\bin\env.exe" MSYSTEM=MINGW32 MSYS=winsymlinks:deepcopy CHERE_INVOKING=1 "!MSYS!\usr\bin\bash.exe" -lc "tar -xf '/!VDRIVE!/tools/downloads/ps2dev-windows-latest.tar.gz' --strip-components=1 -C '/!VDRIVE!/tools/ps2dev'"
     set "TAR_RESULT=!ERRORLEVEL!"
 
-    rem Lo decisivo es que haya quedado el toolchain necesario para Totrus.
+    rem Lo decisivo es que haya quedado el toolchain necesario para Block Battle.
     rem Si tar solo protesta por aliases/symlinks de ps2sdk-ports, pero el
     rem compilador, PS2SDK y gsKit existen, no bloqueamos el entorno.
     if not exist "!PS2DEV!\ee\bin\mips64r5900el-ps2-elf-gcc.exe" (
@@ -140,7 +140,7 @@ if exist "!PS2DEV!\ee\bin\mips64r5900el-ps2-elf-gcc.exe" (
 
     if not "!TAR_RESULT!"=="0" (
         echo AVISO: tar reporto enlaces opcionales que Windows no pudo recrear.
-        echo        El compilador, PS2SDK y gsKit necesarios para Totrus estan presentes.
+        echo        El compilador, PS2SDK y gsKit necesarios para Block Battle estan presentes.
     )
 )
 
@@ -162,7 +162,7 @@ echo ========================================
 echo              ENTORNO LISTO
 echo ========================================
 echo.
-echo Todo el entorno de Totrus esta dentro de .\tools\
+echo Todo el entorno de Block Battle esta dentro de .\tools\
 echo La carpeta completa se puede mover a otra unidad o ruta.
 echo.
 pause
@@ -201,6 +201,6 @@ exit /b 1
 
 :fatal
 echo.
-echo No se pudo preparar una ruta temporal segura para Totrus.
+echo No se pudo preparar una ruta temporal segura para Block Battle.
 pause
 exit /b 1

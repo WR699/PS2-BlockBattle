@@ -2,7 +2,7 @@
 setlocal EnableExtensions EnableDelayedExpansion
 chcp 65001 >nul
 
-title Totrus - PlayStation 2 Build
+title Block Battle - PlayStation 2 Build
 
 rem Todo parte de la ubicacion real de compilar.bat.
 set "ROOT=%~dp0"
@@ -36,7 +36,7 @@ set "PS2DEV_UNIX=/!VDRIVE!/tools/ps2dev"
 
 echo.
 echo ========================================
-echo          TOTRUS - PS2 BUILD
+echo          BLOCK BATTLE - PS2 BUILD
 echo ========================================
 echo.
 
@@ -54,21 +54,21 @@ if not "!BUILD_RESULT!"=="0" (
     exit /b !BUILD_RESULT!
 )
 
-if not exist "!BUILD!\TOTRUS.ELF" (
+if not exist "!BUILD!\BLOCKBATTLE.ELF" (
     call :unmap_root
-    echo ERROR: make termino sin error pero no existe build\TOTRUS.ELF.
+    echo ERROR: make termino sin error pero no existe build\BLOCKBATTLE.ELF.
     pause
     exit /b 1
 )
 
-rem El build local queda listo para copiar directamente a APPS\TOTRUS.
+rem El build local queda listo para copiar directamente a APPS\BLOCKBATTLE.
 if not exist "!BUILD!" mkdir "!BUILD!"
-> "!BUILD!\title.cfg" echo title=Totrus
->>"!BUILD!\title.cfg" echo boot=TOTRUS.ELF
+> "!BUILD!\title.cfg" echo title=BlockBattle
+>>"!BUILD!\title.cfg" echo boot=BLOCKBATTLE.ELF
 
 echo.
 echo Build local listo:
-echo   !BUILD!\TOTRUS.ELF
+echo   !BUILD!\BLOCKBATTLE.ELF
 echo   !BUILD!\title.cfg
 
 rem ============================================================
@@ -77,7 +77,7 @@ rem No encontrar LONE WOLF nunca invalida el build.
 rem ============================================================
 echo.
 powershell.exe -NoProfile -ExecutionPolicy Bypass -Command ^
-  "$v=$null; foreach($candidate in (Get-Volume -ErrorAction SilentlyContinue)){ if($candidate.FileSystemLabel -eq 'LONE WOLF' -and $candidate.DriveLetter){ $v=$candidate; break } }; if($null -eq $v){ Write-Host 'LONE WOLF no esta conectado. Se omite el deploy; la compilacion fue exitosa.'; exit 0 }; $dest=($v.DriveLetter + ':\APPS\TOTRUS'); Write-Host ('LONE WOLF encontrado en ' + $v.DriveLetter + ': - intentando deploy...'); $null=New-Item -ItemType Directory -Force -Path $dest; Copy-Item -LiteralPath '%ROOT%\build\TOTRUS.ELF' -Destination (Join-Path $dest 'TOTRUS.ELF') -Force -ErrorAction Stop; Copy-Item -LiteralPath '%ROOT%\build\title.cfg' -Destination (Join-Path $dest 'title.cfg') -Force -ErrorAction Stop; Write-Host ('Deploy actualizado: ' + $dest)"
+  "$v=$null; foreach($candidate in (Get-Volume -ErrorAction SilentlyContinue)){ if($candidate.FileSystemLabel -eq 'LONE WOLF' -and $candidate.DriveLetter){ $v=$candidate; break } }; if($null -eq $v){ Write-Host 'LONE WOLF no esta conectado. Se omite el deploy; la compilacion fue exitosa.'; exit 0 }; $dest=($v.DriveLetter + ':\APPS\BLOCKBATTLE'); Write-Host ('LONE WOLF encontrado en ' + $v.DriveLetter + ': - intentando deploy...'); $null=New-Item -ItemType Directory -Force -Path $dest; Copy-Item -LiteralPath '%ROOT%\build\BLOCKBATTLE.ELF' -Destination (Join-Path $dest 'BLOCKBATTLE.ELF') -Force -ErrorAction Stop; Copy-Item -LiteralPath '%ROOT%\build\title.cfg' -Destination (Join-Path $dest 'title.cfg') -Force -ErrorAction Stop; Write-Host ('Deploy actualizado: ' + $dest)"
 set "DEPLOY_RESULT=!ERRORLEVEL!"
 if not "!DEPLOY_RESULT!"=="0" (
     echo AVISO: el build local esta bien, pero fallo el deploy opcional a LONE WOLF.
@@ -90,7 +90,7 @@ echo ========================================
 echo          BUILD COMPLETADO
 echo ========================================
 echo.
-echo Salida local: build\TOTRUS.ELF + build\title.cfg
+echo Salida local: build\BLOCKBATTLE.ELF + build\title.cfg
 echo.
 pause
 exit /b 0
@@ -118,6 +118,6 @@ exit /b 0
 
 :fatal
 echo.
-echo No se pudo preparar una ruta temporal segura para Totrus.
+echo No se pudo preparar una ruta temporal segura para Block Battle.
 pause
 exit /b 1

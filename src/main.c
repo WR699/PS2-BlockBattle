@@ -6,8 +6,8 @@
 #include <gsKit.h>
 #include <dmaKit.h>
 
-#include "totrus_input.h"
-#include "totrus_screen.h"
+#include "block_battle_input.h"
+#include "block_battle_screen.h"
 
 
 

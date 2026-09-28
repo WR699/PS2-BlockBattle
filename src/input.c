@@ -1,7 +1,7 @@
 #include <stddef.h>
 #include <sifrpc.h>
 #include <loadfile.h>
-#include "totrus_input.h"
+#include "block_battle_input.h"
 
 static unsigned char padBuf[256] __attribute__((aligned(64)));
 

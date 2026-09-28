@@ -1,5 +1,5 @@
 BUILD_DIR = build
-EE_BIN = $(BUILD_DIR)/TOTRUS.ELF
+EE_BIN = $(BUILD_DIR)/BLOCKBATTLE.ELF
 EE_OBJS = src/main.o src/input.o src/screen.o
 
 EE_INCS += -Iinclude
@@ -18,7 +18,7 @@ $(BUILD_DIR):
 $(EE_BIN): | $(BUILD_DIR)
 
 clean:
-	rm -f $(EE_BIN) $(EE_OBJS) $(BUILD_DIR)/TOTRUS.map
+	rm -f $(EE_BIN) $(EE_OBJS) $(BUILD_DIR)/BLOCKBATTLE.map
 
 run: $(EE_BIN)
 	ps2client execee host:$(EE_BIN)
