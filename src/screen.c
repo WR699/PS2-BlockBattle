@@ -1,4 +1,5 @@
 #include "totrus_screen.h"
+#include <debug.h>
 
 //0 = both empty, 240 = top full bottom empty; 15 = bottom full top empty; 255 both full
 
@@ -14,7 +15,7 @@ u8 screen [10][10] = {
     {0,0,0,0,0,0,0,0,0,0},
     {0,0,0,0,0,0,0,0,0,0},
     {0,0,0,0,0,0,0,0,0,0},
-    {15,2,0,0,0,0,0,0,0,240},
+    {15,0,0,0,0,0,0,0,0,240},
 };
 
 //negro    = GS_SETREG_RGBAQ(0x00, 0x00, 0x00, 0x80, 0x00);
@@ -40,11 +41,12 @@ void clearBlocks(void){
 }
 
 void renderScreen(GSGLOBAL *gs){
-    const float blockSize = 32.0f;
+ 
+    const float blockSize = 15.0f;
     const float gap = 2.0f;
 
     const float width = SCREEN_WIDTH * blockSize;
-    const float height = SCREEN_HEIGHT * blockSize;
+    const float height = SCREEN_HEIGHT * 2 * blockSize;
 
     const float startX = (gs->Width - width) * 0.5f;
     const float startY = (gs->Height - height) * 0.5f;
@@ -55,20 +57,24 @@ void renderScreen(GSGLOBAL *gs){
 
     for(column = 0; column < SCREEN_WIDTH; column++){
         for(row = 0; row < SCREEN_HEIGHT; row++){
-            if(getBlock(row, column) == 0) continue;
-
-            float x = startX + column * blockSize;
-            float y = startY + row * blockSize;
-
-            gsKit_prim_sprite(
-                gs,
-                x + gap,
-                y + gap,
-                x + blockSize - gap,
-                y + blockSize - gap,
-                1,
-                cyan
-            );
+            u8 blocks = getBlock(row, column);
+            float x,y;
+            if ((blocks & 0xF0) != 0)
+            {
+                x = startX + column * blockSize;
+                y = startY + row * 2 * blockSize;
+                gsKit_prim_sprite(gs, x + gap, y + gap, x + blockSize - gap, y + blockSize - gap, 1, cyan);
+               
+            }  
+            if ((blocks & 0x0F) != 0)
+            {
+                x = startX + column * blockSize;
+                y = startY + ((row * 2) + 1) * blockSize;
+                gsKit_prim_sprite(gs, x + gap, y + gap, x + blockSize - gap, y + blockSize - gap, 1, cyan);
+                
+            }
+                      
         }
     }
+    
 };

@@ -1,0 +1,9 @@
+# Entorno portable descargado por install.bat
+tools/msys64/
+tools/ps2dev/
+tools/downloads/
+
+# Build de Totrus
+build/
+*.o
+*.map

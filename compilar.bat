@@ -1,96 +1,123 @@
 @echo off
-setlocal
+setlocal EnableExtensions EnableDelayedExpansion
+chcp 65001 >nul
 
-title TOTRUS - PS2 BUILD
+title Totrus - PlayStation 2 Build
 
+rem Todo parte de la ubicacion real de compilar.bat.
+set "ROOT=%~dp0"
+if "%ROOT:~-1%"=="\" set "ROOT=%ROOT:~0,-1%"
+
+if not exist "%ROOT%\Makefile" (
+    echo ERROR: no encontre Makefile junto a compilar.bat.
+    pause
+    exit /b 1
+)
+
+rem Si falta cualquier parte del entorno local, instalarla automaticamente.
+if not exist "%ROOT%\tools\msys64\usr\bin\bash.exe" goto :install
+if not exist "%ROOT%\tools\ps2dev\ee\bin\mips64r5900el-ps2-elf-gcc.exe" goto :install
+goto :environment_ready
+
+:install
+echo No se encontro el entorno local completo. Ejecutando install.bat...
+call "%ROOT%\install.bat"
+if errorlevel 1 exit /b 1
+
+:environment_ready
+call :map_root
+if errorlevel 1 goto :fatal
+
+set "SAFE_ROOT=!VDRIVE!:\"
+set "MSYS=!SAFE_ROOT!tools\msys64"
+set "BUILD=!SAFE_ROOT!build"
+set "ROOT_UNIX=/!VDRIVE!"
+set "PS2DEV_UNIX=/!VDRIVE!/tools/ps2dev"
+
+echo.
 echo ========================================
 echo          TOTRUS - PS2 BUILD
 echo ========================================
 echo.
 
-set "PROJECT=F:\aa_development_ps2\totrus"
-set "LOCAL_CFG=%PROJECT%\title.cfg"
+"!MSYS!\usr\bin\env.exe" MSYSTEM=MINGW32 CHERE_INVOKING=1 "!MSYS!\usr\bin\bash.exe" -lc "export PS2DEV='!PS2DEV_UNIX!'; export PS2SDK=$PS2DEV/ps2sdk; export GSKIT=$PS2DEV/gsKit; export PATH=$PS2DEV/bin:$PS2DEV/ee/bin:$PS2DEV/iop/bin:$PS2DEV/dvp/bin:$PS2SDK/bin:$PATH; cd '!ROOT_UNIX!' && make clean && make"
+set "BUILD_RESULT=!ERRORLEVEL!"
 
-"C:\msys64\usr\bin\env.exe" MSYSTEM=MINGW32 CHERE_INVOKING=1 /usr/bin/bash -lc "export PS2DEV=/f/aa_development_ps2/totrus/ps2dev; export PS2SDK=$PS2DEV/ps2sdk; export GSKIT=$PS2DEV/gsKit; export PATH=$PS2DEV/bin:$PS2DEV/ee/bin:$PS2DEV/iop/bin:$PS2DEV/dvp/bin:$PS2SDK/bin:$PATH; cd /f/aa_development_ps2/totrus && make clean && make"
-
-if errorlevel 1 (
+if not "!BUILD_RESULT!"=="0" (
+    call :unmap_root
     echo.
     echo ========================================
     echo          ERROR AL COMPILAR
     echo ========================================
     echo.
     pause
-    exit /b 1
+    exit /b !BUILD_RESULT!
 )
 
-echo title=Totrus> "%LOCAL_CFG%"
-echo boot=TOTRUS.ELF>> "%LOCAL_CFG%"
-
-echo.
-echo Compilacion OK.
-echo Config local actualizado:
-echo %LOCAL_CFG%
-echo.
-echo Buscando pendrive LONE WOLF...
-
-echo.
-set "DRIVEFILE=%TEMP%\totrus_drive.txt"
-del "%DRIVEFILE%" 2>nul
-
-powershell.exe -NoProfile -ExecutionPolicy Bypass -Command "$v=Get-Volume -FileSystemLabel 'LONE WOLF' -ErrorAction SilentlyContinue; if($v -and $v[0].DriveLetter){$v[0].DriveLetter}" > "%DRIVEFILE%"
-
-set "USB="
-set /p USB=<"%DRIVEFILE%"
-del "%DRIVEFILE%" 2>nul
-
-if not defined USB (
-    echo No encontre el pendrive LONE WOLF.
-    echo.
-    echo El build local quedo listo en:
-    echo %PROJECT%\TOTRUS.ELF
-    echo %LOCAL_CFG%
-    echo.
-    pause
-    exit /b 0
-)
-
-set "USB=%USB%:"
-
-echo Encontrado: %USB% [LONE WOLF]
-echo.
-
-if not exist "%USB%\APPS" mkdir "%USB%\APPS"
-if not exist "%USB%\APPS\TOTRUS" mkdir "%USB%\APPS\TOTRUS"
-
-copy /Y "%PROJECT%\TOTRUS.ELF" "%USB%\APPS\TOTRUS\TOTRUS.ELF" >nul
-if errorlevel 1 (
-    echo.
-    echo ERROR copiando TOTRUS.ELF al pendrive.
-    echo.
+if not exist "!BUILD!\TOTRUS.ELF" (
+    call :unmap_root
+    echo ERROR: make termino sin error pero no existe build\TOTRUS.ELF.
     pause
     exit /b 1
 )
 
-copy /Y "%LOCAL_CFG%" "%USB%\APPS\TOTRUS\title.cfg" >nul
-if errorlevel 1 (
-    echo.
-    echo ERROR copiando title.cfg al pendrive.
-    echo.
-    pause
-    exit /b 1
+rem El build local queda listo para copiar directamente a APPS\TOTRUS.
+if not exist "!BUILD!" mkdir "!BUILD!"
+> "!BUILD!\title.cfg" echo title=Totrus
+>>"!BUILD!\title.cfg" echo boot=TOTRUS.ELF
+
+echo.
+echo Build local listo:
+echo   !BUILD!\TOTRUS.ELF
+echo   !BUILD!\title.cfg
+
+rem ============================================================
+rem Deploy OPCIONAL. PowerShell hace todo el deploy directamente.
+rem No encontrar LONE WOLF nunca invalida el build.
+rem ============================================================
+echo.
+powershell.exe -NoProfile -ExecutionPolicy Bypass -Command ^
+  "$v=$null; foreach($candidate in (Get-Volume -ErrorAction SilentlyContinue)){ if($candidate.FileSystemLabel -eq 'LONE WOLF' -and $candidate.DriveLetter){ $v=$candidate; break } }; if($null -eq $v){ Write-Host 'LONE WOLF no esta conectado. Se omite el deploy; la compilacion fue exitosa.'; exit 0 }; $dest=($v.DriveLetter + ':\APPS\TOTRUS'); Write-Host ('LONE WOLF encontrado en ' + $v.DriveLetter + ': - intentando deploy...'); $null=New-Item -ItemType Directory -Force -Path $dest; Copy-Item -LiteralPath '%ROOT%\build\TOTRUS.ELF' -Destination (Join-Path $dest 'TOTRUS.ELF') -Force -ErrorAction Stop; Copy-Item -LiteralPath '%ROOT%\build\title.cfg' -Destination (Join-Path $dest 'title.cfg') -Force -ErrorAction Stop; Write-Host ('Deploy actualizado: ' + $dest)"
+set "DEPLOY_RESULT=!ERRORLEVEL!"
+if not "!DEPLOY_RESULT!"=="0" (
+    echo AVISO: el build local esta bien, pero fallo el deploy opcional a LONE WOLF.
 )
+
+call :unmap_root
 
 echo.
 echo ========================================
-echo              TODO LISTO
+echo          BUILD COMPLETADO
 echo ========================================
 echo.
-echo Build local:
-echo %PROJECT%\TOTRUS.ELF
-echo %LOCAL_CFG%
-echo.
-echo Copiado a:
-echo %USB%\APPS\TOTRUS\TOTRUS.ELF
-echo %USB%\APPS\TOTRUS\title.cfg
+echo Salida local: build\TOTRUS.ELF + build\title.cfg
 echo.
 pause
+exit /b 0
+
+:map_root
+set "VDRIVE="
+for %%D in (t u v w x y z r s q p) do (
+    if not exist "%%D:\" (
+        subst %%D: "%ROOT%" >nul 2>&1
+        if not errorlevel 1 (
+            set "VDRIVE=%%D"
+            goto :map_ok
+        )
+    )
+)
+echo ERROR: no encontre una letra de unidad libre para montar temporalmente el proyecto.
+exit /b 1
+
+:map_ok
+exit /b 0
+
+:unmap_root
+if defined VDRIVE subst !VDRIVE!: /d >nul 2>&1
+exit /b 0
+
+:fatal
+echo.
+echo No se pudo preparar una ruta temporal segura para Totrus.
+pause
+exit /b 1
