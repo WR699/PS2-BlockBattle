@@ -12,14 +12,21 @@ u8 screen [10][10] = {
     {0,0,0,0,0,0,0,0,0,0},
     {0,0,0,0,0,0,0,0,0,0},
     {0,0,0,0,0,0,0,0,0,0},
+    {0,0,0,0,0,0,0,0,245,0},
     {0,0,0,0,0,0,0,0,0,0},
     {0,0,0,0,0,0,0,0,0,0},
-    {0,0,0,0,0,0,0,0,0,0},
-    {15,0,0,0,0,0,0,0,0,240},
+    {15,2,0,244,0,0,0,0,0,241},
 };
 
-//negro    = GS_SETREG_RGBAQ(0x00, 0x00, 0x00, 0x80, 0x00);
-//celeste  = GS_SETREG_RGBAQ(0x00, 0xC0, 0xFF, 0x80, 0x00);
+static u64 red   = GS_SETREG_RGBAQ(0xFF, 0x06, 0x06, 0x80, 0x00);
+static u64 green = GS_SETREG_RGBAQ(0x06, 0xFF, 0x06, 0x80, 0x00);
+static u64 blue = GS_SETREG_RGBAQ(0x06, 0x06, 0xFF, 0x80, 0x00);
+static u64 yellow = GS_SETREG_RGBAQ(0xFF, 0xD0, 0x00, 0x80, 0x00);
+static u64 orange = GS_SETREG_RGBAQ(0xFF, 0xB0, 0x00, 0x80, 0x00);
+static u64 cyan    = GS_SETREG_RGBAQ(0x00, 0x00, 0x00, 0x80, 0x00);
+static u64 black  = GS_SETREG_RGBAQ(0x00, 0xC0, 0xFF, 0x80, 0x00);
+
+
 
 
 
@@ -51,7 +58,7 @@ void renderScreen(GSGLOBAL *gs){
     const float startX = (gs->Width - width) * 0.5f;
     const float startY = (gs->Height - height) * 0.5f;
 
-    const u64 cyan = GS_SETREG_RGBAQ(0x00, 0xC0, 0xFF, 0x80, 0x00);
+    u64 color = GS_SETREG_RGBAQ(0x00, 0xC0, 0xFF, 0x80, 0x00);
 
     u8 column, row;
 
@@ -59,18 +66,35 @@ void renderScreen(GSGLOBAL *gs){
         for(row = 0; row < SCREEN_HEIGHT; row++){
             u8 blocks = getBlock(row, column);
             float x,y;
-            if ((blocks & 0xF0) != 0)
+            u8 momentary;
+            if ((momentary = (blocks & 0xF0)) != 0 )
             {
+                switch (momentary - 240){
+                case 1: color = red; break;
+                case 2: color = blue; break;
+                case 3: color = green; break;
+                case 4: color = cyan; break;
+                case 5: color = yellow; break;
+                default: color = orange; break;
+                };
                 x = startX + column * blockSize;
                 y = startY + row * 2 * blockSize;
-                gsKit_prim_sprite(gs, x + gap, y + gap, x + blockSize - gap, y + blockSize - gap, 1, cyan);
+                gsKit_prim_sprite(gs, x + gap, y + gap, x + blockSize - gap, y + blockSize - gap, 1, color);
                
             }  
-            if ((blocks & 0x0F) != 0)
+            if ((momentary = (blocks & 0x0F)) != 0)
             {
+                switch (momentary){
+                case 1: color = red; break;
+                case 2: color = blue; break;
+                case 3: color = green; break;
+                case 4: color = cyan; break;
+                case 5: color = yellow; break;
+                default: color = orange; break;
+                };
                 x = startX + column * blockSize;
                 y = startY + ((row * 2) + 1) * blockSize;
-                gsKit_prim_sprite(gs, x + gap, y + gap, x + blockSize - gap, y + blockSize - gap, 1, cyan);
+                gsKit_prim_sprite(gs, x + gap, y + gap, x + blockSize - gap, y + blockSize - gap, 1, color);
                 
             }
                       
