@@ -56,7 +56,7 @@ void clearBlocks(void){
     u8 column, row;
     for(column = 0; column < SCREEN_WIDTH; column++)
         for(row = 0; row < SCREEN_HEIGHT; row++)
-            screen[column][row] = 0;
+            screen[row][column] = 0;
 }
 
 void renderScreen(GSGLOBAL *gs){
@@ -81,7 +81,7 @@ void renderScreen(GSGLOBAL *gs){
             u8 momentary;
             if ((momentary = (blocks & 0xF0)) != 0 )
             {
-                switch (momentary - 240){
+                switch (momentary >> 4){
                 case 1: color = red; break;
                 case 2: color = blue; break;
                 case 3: color = green; break;

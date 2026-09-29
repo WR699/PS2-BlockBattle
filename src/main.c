@@ -8,12 +8,14 @@
 
 #include "block_battle_input.h"
 #include "block_battle_screen.h"
+#include "block_battle_piece.h"
 
 
-
+u32 frame_counter;
 
 int main(int argc, char *argv[])
 {
+    frame_counter = 0;
     GSGLOBAL *gs;
     u64 negro, celeste, amarillo, rojo;
     float x, y;
@@ -53,14 +55,31 @@ int main(int argc, char *argv[])
 
     x = (gs->Width - tam) * 0.5f;
     y = (gs->Height - tam) * 0.5f;
-
+    createPiece(1);
     while(1)
     {
         u32 mando = leerMando();
-    
+        if (frame_counter >= 30){
+            frame_counter = 0;
+            movePieceDown();
+            if (getPiecePositionRow() >= 19){
+                erasePiece(getPiecePositionRow(), getPiecePositionColumn());
+                setPiecePositionRow(0);
+                drawPiece(getPiecePositionRow(), getPiecePositionColumn());
+            }
+        }
 
-        if(mando & PAD_LEFT)  x -= velocidad;
-        if(mando & PAD_RIGHT) x += velocidad;
+        if(mando & PAD_LEFT)  {
+            erasePiece(getPiecePositionRow(), getPiecePositionColumn());
+            setPiecePositionColumn(getPiecePositionColumn() - 1);
+            drawPiece(getPiecePositionRow(), getPiecePositionColumn());
+        }
+
+        if(mando & PAD_RIGHT){
+            erasePiece(getPiecePositionRow(), getPiecePositionColumn());
+            setPiecePositionColumn(getPiecePositionColumn() + 1);
+            drawPiece(getPiecePositionRow(), getPiecePositionColumn());
+        } 
         if(mando & PAD_UP)    y -= velocidad;
         if(mando & PAD_DOWN)  y += velocidad;
 
@@ -78,7 +97,7 @@ int main(int argc, char *argv[])
         renderScreen(gs);
 
         u64 color = amarillo;
-
+        /*
         gsKit_prim_sprite(
             gs,
             x, y,
@@ -86,11 +105,13 @@ int main(int argc, char *argv[])
             1,
             color
         );
+        */
 
         
 
         gsKit_queue_exec(gs);
         gsKit_sync_flip(gs);
+        frame_counter ++;
     }
 
     return 0;

@@ -1,6 +1,6 @@
 BUILD_DIR = build
 EE_BIN = $(BUILD_DIR)/BLOCKBATTLE.ELF
-EE_OBJS = src/main.o src/input.o src/screen.o
+EE_OBJS = src/main.o src/input.o src/screen.o src/piece.o
 
 EE_INCS += -Iinclude
 EE_INCS += -I$(GSKIT)/include
