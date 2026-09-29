@@ -4,6 +4,5 @@ tools/ps2dev/
 tools/downloads/
 
 # Build de Totrus
-build/
 *.o
 *.map
