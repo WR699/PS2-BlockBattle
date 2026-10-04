@@ -15,7 +15,7 @@ void erasePiece(u8 row, u8 column);
 void movePieceDown();
 void movePieceBottom();
 void Land();
-void CheckDownwardCollission();
+u8 CheckCollission(u8 vertical_offset, u8 horizontal_offset);
 
 
 #endif

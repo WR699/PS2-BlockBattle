@@ -62,11 +62,6 @@ int main(int argc, char *argv[])
         if (frame_counter >= 30){
             frame_counter = 0;
             movePieceDown();
-            if (getPiecePositionRow() >= 19){
-                erasePiece(getPiecePositionRow(), getPiecePositionColumn());
-                setPiecePositionRow(0);
-                drawPiece(getPiecePositionRow(), getPiecePositionColumn());
-            }
         }
 
         if(mando & PAD_LEFT)  {
@@ -96,16 +91,8 @@ int main(int argc, char *argv[])
         gsKit_clear(gs, negro);
         renderScreen(gs);
 
-        u64 color = amarillo;
-        /*
-        gsKit_prim_sprite(
-            gs,
-            x, y,
-            x + tam, y + tam,
-            1,
-            color
-        );
-        */
+        
+        
 
         
 

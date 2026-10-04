@@ -73,14 +73,14 @@ echo   !BUILD!\title.cfg
 
 rem ============================================================
 rem Deploy OPCIONAL. PowerShell hace todo el deploy directamente.
-rem No encontrar LONE WOLF nunca invalida el build.
+rem No encontrar PS2128 nunca invalida el build.
 rem ============================================================
 echo.
 powershell.exe -NoProfile -ExecutionPolicy Bypass -Command ^
-  "$v=$null; foreach($candidate in (Get-Volume -ErrorAction SilentlyContinue)){ if($candidate.FileSystemLabel -eq 'LONE WOLF' -and $candidate.DriveLetter){ $v=$candidate; break } }; if($null -eq $v){ Write-Host 'LONE WOLF no esta conectado. Se omite el deploy; la compilacion fue exitosa.'; exit 0 }; $dest=($v.DriveLetter + ':\APPS\BLOCKBATTLE'); Write-Host ('LONE WOLF encontrado en ' + $v.DriveLetter + ': - intentando deploy...'); $null=New-Item -ItemType Directory -Force -Path $dest; Copy-Item -LiteralPath '%ROOT%\build\BLOCKBATTLE.ELF' -Destination (Join-Path $dest 'BLOCKBATTLE.ELF') -Force -ErrorAction Stop; Copy-Item -LiteralPath '%ROOT%\build\title.cfg' -Destination (Join-Path $dest 'title.cfg') -Force -ErrorAction Stop; Write-Host ('Deploy actualizado: ' + $dest)"
+  "$v=$null; foreach($candidate in (Get-Volume -ErrorAction SilentlyContinue)){ if($candidate.FileSystemLabel -eq 'PS2128' -and $candidate.DriveLetter){ $v=$candidate; break } }; if($null -eq $v){ Write-Host 'PS2128 no esta conectado. Se omite el deploy; la compilacion fue exitosa.'; exit 0 }; $dest=($v.DriveLetter + ':\APPS\BLOCKBATTLE'); Write-Host ('PS2128 encontrado en ' + $v.DriveLetter + ': - intentando deploy...'); $null=New-Item -ItemType Directory -Force -Path $dest; Copy-Item -LiteralPath '%ROOT%\build\BLOCKBATTLE.ELF' -Destination (Join-Path $dest 'BLOCKBATTLE.ELF') -Force -ErrorAction Stop; Copy-Item -LiteralPath '%ROOT%\build\title.cfg' -Destination (Join-Path $dest 'title.cfg') -Force -ErrorAction Stop; Write-Host ('Deploy actualizado: ' + $dest)"
 set "DEPLOY_RESULT=!ERRORLEVEL!"
 if not "!DEPLOY_RESULT!"=="0" (
-    echo AVISO: el build local esta bien, pero fallo el deploy opcional a LONE WOLF.
+    echo AVISO: el build local esta bien, pero fallo el deploy opcional a PS2128.
 )
 
 call :unmap_root

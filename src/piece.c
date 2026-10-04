@@ -20,7 +20,17 @@ void setPiecePositionColumn(u8 value){
 
 u8 piece_color = 1;
 void createPiece(u8 id){
-    drawPiece(piece_position[0], piece_position[1]);
+  piece_color = id;
+  piece_position[0] = 0;
+  piece_position[1] = 4;
+  switch (id){
+    case 0: current_piece = 0b0000011001100010; break; //square piece with knob
+    case 1: current_piece = 0b0100011000100000; break; //s piece
+    case 2: current_piece = 0b0000111101100000; break; //fat t piece
+    case 3: current_piece = 0b0000011001000000; break; //short l piece
+    case 4: current_piece = 0b0000001001100000; break; //short l piece mirrored
+  }
+  drawPiece(piece_position[0], piece_position[1]);
 };
 
 void drawPiece(u8 row, u8 column){
@@ -74,16 +84,54 @@ void erasePiece(u8 row, u8 column){
 
 
 void movePieceDown(){
-    erasePiece(piece_position[0], piece_position[1]);
-    piece_position[0]++;
-    drawPiece(piece_position[0], piece_position[1]);
+  if (CheckCollission(1,0) == 0){
+      erasePiece(piece_position[0], piece_position[1]);
+      piece_position[0]++;
+      drawPiece(piece_position[0], piece_position[1]);
+  }
+  else{
+    Land();
+  }
 };
 void movePieceBottom(){
 
 };
 void Land(){
+  createPiece(3);
 
 };
-void CheckDownwardCollission(){
+u8 CheckCollission(u8 vertical_offset, u8 horizontal_offset){
+  erasePiece(piece_position[0], piece_position[1]);
+  u8 answer = 0;
+  u8 new_pos[2] = {piece_position[0] + vertical_offset, piece_position[1] + horizontal_offset};
+  u8 block_to_check;
+  for (u8 r = 0; r < 4; r++){ //cada fila de la pieza
+      
+      for (u8 c = 0; c < 2; c++){ //cada columna de la pieza
+        u8 pair = (current_piece >> (14 - (r*4 + c*2))) & 0b11;
+        u8 byteColumn = (new_pos[1] >> 1) + c; 
+        if (pair){
+            if (new_pos[0] + r > 21){answer = 1; continue;}
+            if ((new_pos[1] & 0x01) == 0){
+              block_to_check = getBlock(new_pos[0] + r, byteColumn);
 
+              if(pair & 0b10){ if ((block_to_check & 0xF0) > 0) answer = 1;}
+              if(pair & 0b01){ if ((block_to_check & 0x0F) > 0) answer = 1;}
+              continue;
+            }
+            block_to_check = getBlock(new_pos[0] + r,byteColumn);
+            if(pair & 0b10){ if ((block_to_check & 0x0F) > 0) answer = 1;}
+            block_to_check = getBlock(new_pos[0] + r, byteColumn + 1);
+            if(pair & 0b01) {if ((block_to_check & 0xF0) > 0) answer = 1;}
+          }  
+        }
+    }
+
+  drawPiece(piece_position[0], piece_position[1]);
+      
+  
+  
+ 
+  //*/
+  return answer;
 }; 
