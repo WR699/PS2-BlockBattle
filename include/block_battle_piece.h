@@ -9,13 +9,13 @@ u8 getPiecePositionColumn();
 void setPiecePositionRow(u8 value);
 void setPiecePositionColumn(u8 value);
 
-void createPiece(u8 id);
-void drawPiece(u8 row, u8 column);
-void erasePiece(u8 row, u8 column);
-void movePieceDown();
+void createPiece(s8 id);
+void drawPiece(s8 row, s8 column);
+void erasePiece(s8 row, s8 column);
+void movePiece(s8 vertical_offset, s8 horizontal_offset);
 void movePieceBottom();
 void Land();
-u8 CheckCollission(u8 vertical_offset, u8 horizontal_offset);
+s8 CheckCollission(s8 vertical_offset, s8 horizontal_offset);
 
 
 #endif

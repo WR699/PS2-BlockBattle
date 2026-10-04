@@ -61,19 +61,15 @@ int main(int argc, char *argv[])
         u32 mando = leerMando();
         if (frame_counter >= 30){
             frame_counter = 0;
-            movePieceDown();
+            movePiece(1,0);
         }
 
         if(mando & PAD_LEFT)  {
-            erasePiece(getPiecePositionRow(), getPiecePositionColumn());
-            setPiecePositionColumn(getPiecePositionColumn() - 1);
-            drawPiece(getPiecePositionRow(), getPiecePositionColumn());
+            movePiece(0, -1);
         }
 
         if(mando & PAD_RIGHT){
-            erasePiece(getPiecePositionRow(), getPiecePositionColumn());
-            setPiecePositionColumn(getPiecePositionColumn() + 1);
-            drawPiece(getPiecePositionRow(), getPiecePositionColumn());
+            movePiece(0, 1);
         } 
         if(mando & PAD_UP)    y -= velocidad;
         if(mando & PAD_DOWN)  y += velocidad;
