@@ -114,3 +114,32 @@ void renderScreen(GSGLOBAL *gs){
     }
     
 };
+
+void CheckRows(){
+    for(u8 r = 0; r < 22; r++){
+        u8 delete_this_row = 1;
+        for (u8 c = 0; c < 5; c++){
+            if(((screen[r][c] & 0xF0) && (screen[r][c] & 0x0F)) == 0){
+                
+                delete_this_row = 0;
+                break;
+                
+            }
+            
+        }
+        if (delete_this_row){
+            DeleteRow(r); 
+        }
+
+    }
+}
+void DeleteRow(u8 row){
+    for(u8 r = row; r > 0; r--){
+        for (u8 c = 0; c < 5; c++){
+            screen[r][c] = screen[r-1][c];
+        }
+    }
+    for (u8 c = 0; c < 5; c++){
+            screen[0][c] = 0;
+    }
+}

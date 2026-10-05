@@ -4,19 +4,7 @@ u16 current_piece = 0b0110011000100000;
 
 s8 piece_position[2] = {0,0};
 
-u8 getPiecePositionRow(){
-  return piece_position[0];
-}
-u8 getPiecePositionColumn(){
-  return piece_position[1];
-}
-void setPiecePositionRow(u8 value){
-  piece_position[0] = value;
-}
-void setPiecePositionColumn(u8 value){
-  if (value >= 10) value = 9;
-  piece_position[1] = value;
-}
+
 
 u8 piece_color = 1;
 void createPiece(s8 id){
@@ -86,6 +74,7 @@ void erasePiece(s8 row, s8 column){
 
 
 void movePiece(s8 vertical_offset, s8 horizontal_offset){
+  erasePiece(piece_position[0], piece_position[1]);
   s8 collision = CheckCollission(vertical_offset, horizontal_offset);
   if (collision == 0){
       erasePiece(piece_position[0], piece_position[1]);
@@ -97,15 +86,96 @@ void movePiece(s8 vertical_offset, s8 horizontal_offset){
     Land();
   }
 };
+
 void movePieceBottom(){
+  s8 i = 0;
+  erasePiece(piece_position[0], piece_position[1]);
+  while (CheckCollission(i,0) == 0){
+    erasePiece(piece_position[0]+i, piece_position[1]);
+    i++;
+
+  }
+  erasePiece(piece_position[0], piece_position[1]);
+  drawPiece(piece_position[0] + (i-1), piece_position[1]);
+  Land();
 
 };
+
 void Land(){
+  CheckRows();
   createPiece(3);
 
 };
-s8 CheckCollission(s8 vertical_offset, s8 horizontal_offset){
+
+/*
+ (r,c)           (3-c, r)      (c, 3-r)
+  valor default   rot 1          rot -1
+
+  00,01,02,03     12,08,04,00    03,07,11,15
+  04,05,06,07     13,09,05,01    02,06,10,14
+  08,09,10,11     14,10,06,02    01,05,09,13
+  12,13.14,15     15,11,07,03    00,04,08,12
+*/
+void rotatePiece(s8 direction){
+  u16 bufferpiece = current_piece;
   erasePiece(piece_position[0], piece_position[1]);
+  current_piece = 0;
+  switch(direction){
+    case 1:
+    
+    for (u8 r = 0; r<4; r++){
+      
+      for (u8 c = 0; c<4; c++){
+        s8 offset = 4*r + c;
+        u16 mask = (0b1000000000000000 >> (4*r + c));
+        mask = mask & bufferpiece;
+        s8 new_pos = (3-c) * 4 + r;
+        offset = new_pos - offset;
+
+        if (offset > 0) mask >>= offset;
+        else  mask <<= (-offset);
+        current_piece += mask;
+
+
+    
+      }
+    }
+    if (CheckCollission(0,0) == 1) current_piece = bufferpiece;
+    break;
+
+
+    case -1:
+    
+    
+    for (u8 r = 0; r<4; r++){
+      
+      for (u8 c = 0; c<4; c++){
+        s8 offset = 4*r + c;
+        u16 mask = (0b1000000000000000 >> (4*r + c));
+        mask = mask & bufferpiece;
+        s8 new_pos = c * 4 + 3 - r;
+        offset = new_pos - offset;
+
+        if (offset > 0) mask >>= offset;
+        else  mask <<= (-offset);
+        current_piece += mask;
+
+
+    
+    }
+  }
+    if (CheckCollission(0,0) == 1) current_piece = bufferpiece;
+    break; 
+
+
+  }
+  drawPiece(piece_position[0], piece_position[1]);
+
+};
+
+
+s8 CheckCollission(s8 vertical_offset, s8 horizontal_offset){
+  
   s8 answer = 0;
   s8 new_pos[2] = {piece_position[0] + vertical_offset, piece_position[1] + horizontal_offset};
   u8 block_to_check;

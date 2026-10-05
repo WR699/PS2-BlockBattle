@@ -15,6 +15,9 @@ u32 frame_counter;
 
 int main(int argc, char *argv[])
 {
+    s8 frames_for_input = 10;
+    s8 frames_for_next_input = 0;
+    u8 last_input = 0;
     frame_counter = 0;
     GSGLOBAL *gs;
     u64 negro, celeste, amarillo, rojo;
@@ -58,26 +61,44 @@ int main(int argc, char *argv[])
     createPiece(1);
     while(1)
     {
+        if(frames_for_next_input <= 0){last_input = 0; frames_for_next_input = 0;}
         u32 mando = leerMando();
         if (frame_counter >= 30){
             frame_counter = 0;
             movePiece(1,0);
         }
-
-        if(mando & PAD_LEFT)  {
+        
+        if((last_input != 1) && (mando & PAD_LEFT))  {
+            last_input = 1;
+            frames_for_next_input = frames_for_input;
             movePiece(0, -1);
         }
 
-        if(mando & PAD_RIGHT){
+        if((last_input != 2) && (mando &  PAD_RIGHT)){
+            last_input = 2;
+            frames_for_next_input = frames_for_input;
             movePiece(0, 1);
-        } 
-        if(mando & PAD_UP)    y -= velocidad;
-        if(mando & PAD_DOWN)  y += velocidad;
-
-        if(mando & PAD_START) {
-            x = (gs->Width - tam) * 0.5f;
-            y = (gs->Height - tam) * 0.5f;
         }
+        if((last_input != 3) && (mando &  PAD_R1)){
+            last_input = 3;
+            frames_for_next_input = frames_for_input;
+            rotatePiece(-1);
+        }  
+        if((last_input != 4) && (mando &  PAD_L1)){
+            last_input = 4;
+            frames_for_next_input = frames_for_input;
+            rotatePiece(1);
+        }  
+        if((last_input != 5) && (mando &  PAD_UP)){
+            last_input = 5;
+            frames_for_next_input = frames_for_input;
+            movePieceBottom();
+        }  
+        
+        
+        
+
+       
 
         if(x < 0) x = 0;
         if(y < 0) y = 0;
@@ -95,6 +116,7 @@ int main(int argc, char *argv[])
         gsKit_queue_exec(gs);
         gsKit_sync_flip(gs);
         frame_counter ++;
+        frames_for_next_input--;
     }
 
     return 0;

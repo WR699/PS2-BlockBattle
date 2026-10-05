@@ -11,5 +11,7 @@ u8 getBlock(u8 row, u8 column);
 void setBlock(u8 value, u8 row, u8 column);
 void clearBlocks(void);
 void renderScreen(GSGLOBAL *gs);
+void CheckRows();
+void DeleteRow(u8 row);
 
 #endif
